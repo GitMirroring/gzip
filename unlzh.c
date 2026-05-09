@@ -387,7 +387,7 @@ unlzh (int in, int out)
 
     decode_start();
     while (!done) {
-        n = decode((unsigned) DICSIZ, window);
+        n = decode (DICSIZ, window);
         if (n > 0)
           write_buf (out, window, n);
     }
