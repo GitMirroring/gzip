@@ -29,6 +29,10 @@ GNU gzip NEWS                                    -*- outline -*-
   gzip -l now reports "-Inf%" instead of "0.0%" for the infinite
   compression ratio of an empty file.
 
+  znew's -P option is now ignored, with a warning.  It was present
+  only to improve performance, and its implementation had too many
+  bugs to be worth supporting.
+
 
 * Noteworthy changes in release 1.14 (2025-04-09) [stable]
 
