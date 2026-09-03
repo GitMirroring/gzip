@@ -363,8 +363,17 @@ decode (unsigned count, uch buffer[])
             buffer[r] = c;
             if (++r == count) return r;
         } else {
+            unsigned d = decode_p ();
+            /* A match must not reference bytes before the start of
+               this member's output.  The window is not cleared between
+               members, so without this check a crafted distance copies
+               stale bytes from a previously decompressed file, making
+               this member's output depend on what was decoded before
+               it in the same process.  */
+            if ((unsigned long long) bytes_out + r <= d)
+              gzip_error ("invalid compressed data--distance too far back");
             j = c - (UCHAR_MAX + 1 - THRESHOLD);
-            i = (r - decode_p() - 1) & (DICSIZ - 1);
+            i = (r - d - 1) & (DICSIZ - 1);
             while (--j >= 0) {
                 buffer[r] = buffer[i];
                 i = (i + 1) & (DICSIZ - 1);
