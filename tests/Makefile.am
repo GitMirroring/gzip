@@ -23,6 +23,7 @@ TESTS =					\
   hufts					\
   keep					\
   list					\
+  lzh-window-abuse			\
   memcpy-abuse				\
   mixed					\
   null-suffix-clobber			\

@@ -1,0 +1,47 @@
+#!/bin/sh
+# Exercise a gzip -d bug whereby a crafted .lzh (SCO 'compress -H') file
+# could copy stale bytes from the window left behind by a previously
+# decompressed file, making its output depend on what was decompressed
+# before it in the same gzip process.
+
+# Copyright (C) 2026 Free Software Foundation, Inc.
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ..
+
+# A crafted .lzh whose very first match has a distance pointing before
+# the start of its own output.  Before the fix this copied whatever the
+# 8192-byte decode window happened to contain from earlier in the same
+# process (zeros in a fresh process; the preceding file's data otherwise).
+hex_printf_ '\x1f\xa0\x0f\x00\x00\x00\x10\x00\xdd\x00\xff' > in.lzh \
+  || framework_failure_
+
+# An LZW (.Z) file to fill the shared window with nonzero data.
+z='\x61\xc2\x84\x09\x13\x26\x4c\x98\x30'
+z=$z$z$z$z
+z=$z$z$z$z
+hex_printf_ '\x1f\x9d\x90'"$z$z" > poison.Z || framework_failure_
+
+fail=0
+
+# The crafted file must be rejected identically, with or without a
+# preceding file in the same process.  (Before the fix, both invocations
+# "succeeded" but produced different output.)
+returns_ 1 gzip -dc in.lzh > out1 2> err1 || fail=1
+returns_ 1 gzip -dc poison.Z in.lzh > out2 2> err2 || fail=1
+compare err1 err2 || fail=1
+compare out1 out2 || fail=1
+
+Exit $fail

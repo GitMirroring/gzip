@@ -22,6 +22,11 @@ GNU gzip NEWS                                    -*- outline -*-
   when an internal bit buffer is not properly cleared.
   [bug present since the beginning]
 
+  gzip -d no longer lets a crafted .lzh file copy stale bytes from the
+  window of a previously decompressed file; a match distance that points
+  before the start of the member's output is now reported as invalid
+  compressed data.  [bug present since the beginning]
+
   On old-fashioned or limited platforms lacking mktemp, gzexe, zdiff
   and znew no longer have a race when creating a temporary file.
   [bug present since the beginning]
