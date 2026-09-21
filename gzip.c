@@ -58,7 +58,6 @@ static char const license_msg[] =
 
 #include "tailor.h"
 
-#include "gzip.h"
 #include "lzw.h"
 #include "revision.h"
 #include "version.h"
@@ -98,6 +97,11 @@ static char const license_msg[] =
 #ifndef NO_UTIME
 #  include <utimens.h>
 #endif
+
+/* Include this only after all system headers. Otherwise, its definition
+   of "head" conflicts with member names in linux-headers 7.2.6's
+   asm/sigcontext.h pulled in via <signal.h>.  */
+#include "gzip.h"
 
 #ifndef MAX_PATH_LEN
 #  define MAX_PATH_LEN   1024 /* max pathname length */
