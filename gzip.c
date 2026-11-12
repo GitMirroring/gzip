@@ -184,12 +184,7 @@ DECLARE(uch BUFFER_ALIGNED, inbuf,  INBUFSIZ +INBUF_EXTRA);
 DECLARE(uch BUFFER_ALIGNED, outbuf, OUTBUFSIZ+OUTBUF_EXTRA);
 DECLARE(ush, d_buf,  DIST_BUFSIZE);
 DECLARE(uch BUFFER_ALIGNED, window, 2L*WSIZE);
-#ifndef MAXSEG_64K
-    DECLARE(ush, tab_prefix, 1L<<BITS);
-#else
-    DECLARE(ush, tab_prefix0, 1L<<(BITS-1));
-    DECLARE(ush, tab_prefix1, 1L<<(BITS-1));
-#endif
+DECLARE(ush, tab_prefix, 1L << BITS);
 
                 /* local variables */
 
@@ -652,18 +647,6 @@ int main (int argc, char **argv)
                  quotef (z_suffix));
         do_exit(ERROR);
     }
-
-    /* Allocate all global buffers (for DYN_ALLOC option) */
-    ALLOC(uch, inbuf,  INBUFSIZ +INBUF_EXTRA);
-    ALLOC(uch, outbuf, OUTBUFSIZ+OUTBUF_EXTRA);
-    ALLOC(ush, d_buf,  DIST_BUFSIZE);
-    ALLOC(uch, window, 2L*WSIZE);
-#ifndef MAXSEG_64K
-    ALLOC(ush, tab_prefix, 1L<<BITS);
-#else
-    ALLOC(ush, tab_prefix0, 1L<<(BITS-1));
-    ALLOC(ush, tab_prefix1, 1L<<(BITS-1));
-#endif
 
     int stdopen_err = stdopen ();
     if (stdopen_err)
@@ -2120,16 +2103,6 @@ do_exit (int exitcode)
     in_exit = 1;
     free(env);
     env  = NULL;
-    FREE(inbuf);
-    FREE(outbuf);
-    FREE(d_buf);
-    FREE(window);
-#ifndef MAXSEG_64K
-    FREE(tab_prefix);
-#else
-    FREE(tab_prefix0);
-    FREE(tab_prefix1);
-#endif
     exit(exitcode);
 }
 

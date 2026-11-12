@@ -18,8 +18,8 @@
 #include "tailor.h"
 
 extern long block_start;
-extern unsigned int near prev_length;
-extern unsigned near strstart;
-extern unsigned near match_start;
+extern unsigned int prev_length;
+extern unsigned strstart;
+extern unsigned match_start;
 extern unsigned max_chain_length;
 extern unsigned good_match;

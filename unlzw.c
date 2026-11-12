@@ -69,21 +69,9 @@ union bytes
    }
 #endif
 
-#ifndef MAXSEG_64K
-   /* DECLARE(ush, tab_prefix, (1<<BITS)); -- prefix code */
-#  define tab_prefixof(i) tab_prefix[i]
-#  define clear_tab_prefixof() memzero (tab_prefix, 256);
-#else
-   /* DECLARE(ush, tab_prefix0, (1<<(BITS-1)); -- prefix for even codes */
-   /* DECLARE(ush, tab_prefix1, (1<<(BITS-1)); -- prefix for odd  codes */
-   ush *tab_prefix[2];
-#  define tab_prefixof(i) tab_prefix[(i)&1][(i)>>1]
-#  define clear_tab_prefixof() \
-      memzero(tab_prefix0, 128), \
-      memzero(tab_prefix1, 128);
-#endif
+/* DECLARE (ush, tab_prefix, 1 << BITS); -- prefix code */
+#define clear_tab_prefixof() memzero (tab_prefix, 256);
 #define de_stack        ((char_type *)(&d_buf[DIST_BUFSIZE-1]))
-#define tab_suffixof(i) tab_suffix[i]
 
 /* block compress mode -C compatible with 2.0 */
 static int block_mode = BLOCK_MODE;
@@ -117,10 +105,6 @@ unlzw (int in, int out)
     int        n_bits;
     int        rsize;
 
-#ifdef MAXSEG_64K
-    tab_prefix[0] = tab_prefix0;
-    tab_prefix[1] = tab_prefix1;
-#endif
     maxbits = get_byte();
     block_mode = maxbits & BLOCK_MODE;
     if ((maxbits & LZW_RESERVED) != 0) {
@@ -151,7 +135,7 @@ unlzw (int in, int out)
     clear_tab_prefixof(); /* Initialize the first 256 entries in the table. */
 
     for (code = 255 ; code >= 0 ; --code) {
-        tab_suffixof(code) = (char_type)code;
+        tab_suffix[code] = (char_type)code;
     }
     do {
         int i;
@@ -239,10 +223,11 @@ unlzw (int in, int out)
 
             while ((cmp_code_int)code >= (cmp_code_int)256) {
                 /* Generate output characters in reverse order */
-                *--stackp = tab_suffixof(code);
-                code = tab_prefixof(code);
+                *--stackp = tab_suffix[code];
+                code = tab_prefix[code];
             }
-            *--stackp = (char_type) (finchar = tab_suffixof (code));
+            finchar = tab_suffix[code];
+            *--stackp = (char_type) finchar;
 
             /* And put them out in forward order */
             {
@@ -270,8 +255,8 @@ unlzw (int in, int out)
 
             if ((code = free_ent) < maxmaxcode) { /* Generate the new entry. */
 
-                tab_prefixof(code) = (unsigned short)oldcode;
-                tab_suffixof(code) = (char_type)finchar;
+                tab_prefix[code] = (unsigned short)oldcode;
+                tab_suffix[code] = (char_type)finchar;
                 free_ent = code+1;
             }
             oldcode = incode;   /* Remember previous code.  */

@@ -27,10 +27,6 @@
 #include "tailor.h"
 #include "gzip.h"
 
-#ifdef DYN_ALLOC
-# error "DYN_ALLOC is not supported by DFLTCC"
-#endif
-
 /* ===========================================================================
  * C wrappers for the DEFLATE CONVERSION CALL instruction.
  */

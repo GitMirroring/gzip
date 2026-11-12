@@ -107,10 +107,10 @@
  * window with tab_suffix. Check that we can do this:
  */
 #if (WSIZE<<1) > (1<<BITS)
-   error: cannot overlay window with tab_suffix and prev with tab_prefix0
+# error "cannot overlay window with tab_suffix and prev with tab_prefix"
 #endif
 #if HASH_BITS > BITS-1
-   error: cannot overlay head with tab_prefix1
+# error "cannot overlay head with tab_prefix"
 #endif
 
 #define HASH_SIZE (unsigned)(1<<HASH_BITS)
@@ -183,13 +183,13 @@ static unsigned ins_h;  /* hash index of string to be inserted */
  *   H_SHIFT * MIN_MATCH >= HASH_BITS
  */
 
-unsigned int near prev_length;
+unsigned int prev_length;
 /* Length of the best match at previous step. Matches not greater than this
  * are discarded. This is used in the lazy match evaluation.
  */
 
-unsigned near strstart;      /* start of string to insert */
-unsigned near match_start;   /* start of matching string */
+unsigned strstart;           /* start of string to insert */
+unsigned match_start;        /* start of matching string */
 static int eofile;           /* Flag set at end of input file.  */
 static unsigned lookahead;   /* Number of valid bytes ahead in window.  */
 
@@ -305,11 +305,7 @@ lm_init (int pack_level)
     if (pack_level < 1 || pack_level > 9) gzip_error ("bad pack level");
 
     /* Initialize the hash table. */
-#if defined MAXSEG_64K && HASH_BITS == 15
-    for (j = 0;  j < HASH_SIZE; j++) head[j] = NIL;
-#else
     memzero((char*)head, HASH_SIZE*sizeof(*head));
-#endif
     /* prev will be initialized on the fly */
 
     /* rsync params */
@@ -383,7 +379,7 @@ longest_match(IPos cur_match)
  * It is easy to get rid of this optimization if necessary.
  */
 #if HASH_BITS < 8 || MAX_MATCH != 258
-   error: Code too clever
+# error "Code too clever"
 #endif
 
 #ifdef UNALIGNED_OK

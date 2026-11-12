@@ -95,36 +95,17 @@ extern int method;         /* compression method */
 #  endif
 #endif
 
-#ifdef DYN_ALLOC
-#  define EXTERN(type, array)  extern type * near array
-#  define DECLARE(type, array, size)  type * near array
-#  define ALLOC(type, array, size) { \
-      array = (type*)fcalloc((size_t)(((size)+1L)/2), 2*sizeof(type)); \
-      if (!array) xalloc_die (); \
-   }
-#  define FREE(array) {if (array != NULL) fcfree(array), array=NULL;}
-#else
-#  define EXTERN(type, array)  extern type array[]
-#  define DECLARE(type, array, size)  type array[size]
-#  define ALLOC(type, array, size)
-#  define FREE(array)
-#endif
+#define EXTERN(type, array)  extern type array[]
+#define DECLARE(type, array, size)  type array[size]
 
 EXTERN(uch, inbuf);          /* input buffer */
 EXTERN(uch, outbuf);         /* output buffer */
 EXTERN(ush, d_buf);          /* buffer for distances, see trees.c */
 EXTERN(uch, window);         /* Sliding window and suffix table (unlzw) */
 #define tab_suffix window
-#ifndef MAXSEG_64K
-#  define tab_prefix prev    /* hash link (see deflate.c) */
-#  define head (prev+WSIZE)  /* hash head (see deflate.c) */
-   EXTERN(ush, tab_prefix);  /* prefix code (see unlzw.c) */
-#else
-#  define tab_prefix0 prev
-#  define head tab_prefix1
-   EXTERN(ush, tab_prefix0); /* prefix for even codes */
-   EXTERN(ush, tab_prefix1); /* prefix for odd  codes */
-#endif
+#define tab_prefix prev      /* hash link (see deflate.c) */
+#define head (prev + WSIZE)  /* hash head (see deflate.c) */
+EXTERN (ush, tab_prefix);    /* prefix code (see unlzw.c) */
 
 extern unsigned insize; /* valid bytes in inbuf */
 extern unsigned inptr;  /* index of next byte to be processed in inbuf */

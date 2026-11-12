@@ -34,20 +34,6 @@
 #endif
 
 #ifdef MSDOS
-#  ifdef __GNUC__
-     /* DJGPP version 1.09+ on MS-DOS.
-      * The DJGPP 1.09 stat() function must be upgraded before gzip will
-      * fully work.
-      */
-#    define near
-#  else
-#    define MAXSEG_64K
-#    ifdef __TURBOC__
-#      define off_t long
-#    else /* MSC */
-#      define HAVE_SYS_UTIME_H
-#    endif
-#  endif
 #  define MAX_PATH_LEN  128
 #  define NO_MULTIPLE_DOTS
 #  define MAX_EXT_CHARS 3
@@ -61,8 +47,6 @@
 #  if !defined(NO_ASM) && !defined(ASMV)
 #    define ASMV
 #  endif
-#else
-#  define near
 #endif
 
 #ifdef OS2
@@ -77,14 +61,7 @@
 #  include <io.h>
 #  define OS_CODE  0x06
 #  define SET_BINARY_MODE(fd) setmode(fd, O_BINARY)
-#  ifdef _MSC_VER
-#    define HAVE_SYS_UTIME_H
-#    define MAXSEG_64K
-#    undef near
-#    define near _near
-#  endif
 #  ifdef __EMX__
-#    define HAVE_SYS_UTIME_H
 #    define EXPAND(argc,argv) \
        {_response(&argc, &argv); _wildcard(&argc, &argv);}
 #  endif
@@ -97,7 +74,6 @@
 #endif
 
 #if defined WIN32 || defined _WIN32
-#  define HAVE_SYS_UTIME_H
 #  define MAX_PATH_LEN  260
 #  define SET_BINARY_MODE(fd) setmode(fd, O_BINARY)
 #  define UNLINK_READONLY_BUG
@@ -110,27 +86,6 @@
 #    define casemap(c) c_tolower (c) /* Force file names to lower case.  */
 #  endif
 #  define OS_CODE  0x0b
-#endif
-
-#ifdef MSDOS
-#  ifdef __TURBOC__
-#    include <alloc.h>
-#    define DYN_ALLOC
-     /* Turbo C 2.0 does not accept static allocations of large arrays */
-     void * fcalloc (unsigned items, unsigned size);
-     void fcfree (void *ptr);
-#  else /* MSC */
-#    include <malloc.h>
-#    define fcalloc(nitems,itemsize) halloc((long)(nitems),(itemsize))
-#    define fcfree(ptr) hfree(ptr)
-#  endif
-#else
-#  ifdef MAXSEG_64K
-#    define fcalloc(items,size) calloc((items),(size))
-#  else
-#    define fcalloc(items,size) malloc((size_t)(items)*(size_t)(size))
-#  endif
-#  define fcfree(ptr) free(ptr)
 #endif
 
 #if defined(ATARI) || defined(atarist)
