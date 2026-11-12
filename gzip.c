@@ -170,21 +170,12 @@ gzip_unlinkat (_GL_ATTRIBUTE_MAYBE_UNUSED int fd, char const *file, int flags)
 
                 /* global buffers */
 
-/* With IBM_Z_DFLTCC, DEFLATE COMPRESSION works faster with
-   page-aligned input and output buffers, and requires page-aligned
-   windows; the alignment requirement is 4096.  On other platforms
-   alignment doesn't hurt, and alignment up to 4096 is portable so
-   let's do that.  */
-#if defined HAVE_C_ALIGNASOF || defined alignas
-# define BUFFER_ALIGNED alignas (4096)
-#else
-# define BUFFER_ALIGNED /**/
-#endif
-DECLARE(uch BUFFER_ALIGNED, inbuf,  INBUFSIZ +INBUF_EXTRA);
-DECLARE(uch BUFFER_ALIGNED, outbuf, OUTBUFSIZ+OUTBUF_EXTRA);
-DECLARE(ush, d_buf,  DIST_BUFSIZE);
-DECLARE(uch BUFFER_ALIGNED, window, 2L*WSIZE);
-DECLARE(ush, tab_prefix, 1L << BITS);
+/* See gzip.h for commentary on these.  */
+uch BUFFER_ALIGNED inbuf[INBUFSIZ + INBUF_EXTRA];
+uch BUFFER_ALIGNED outbuf[OUTBUFSIZ + OUTBUF_EXTRA];
+ush d_buf[DIST_BUFSIZE];
+uch BUFFER_ALIGNED window[2 * WSIZE];
+ush tab_prefix[1 << BITS];
 
                 /* local variables */
 

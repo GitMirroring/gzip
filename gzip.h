@@ -83,17 +83,36 @@ extern int method;         /* compression method */
 #    define DIST_BUFSIZE 0x8000 /* buffer for distances, see trees.c */
 #endif
 
-#define EXTERN(type, array)  extern type array[]
-#define DECLARE(type, array, size)  type array[size]
+/* With IBM_Z_DFLTCC, DEFLATE COMPRESSION works faster with
+   page-aligned input and output buffers, and requires page-aligned
+   windows; the alignment requirement is 4096.  On other platforms
+   alignment doesn't hurt, and alignment up to 4096 is portable so
+   let's do that.  */
+#if defined HAVE_C_ALIGNASOF || defined alignas
+# define BUFFER_ALIGNED alignas (4096)
+#else
+# define BUFFER_ALIGNED /**/
+#endif
 
-EXTERN(uch, inbuf);          /* input buffer */
-EXTERN(uch, outbuf);         /* output buffer */
-EXTERN(ush, d_buf);          /* buffer for distances, see trees.c */
-EXTERN(uch, window);         /* Sliding window and suffix table (unlzw) */
+/* Global buffers.  */
+
+/* Input buffer.  */
+extern uch BUFFER_ALIGNED inbuf[];
+
+/* Output buffer.  */
+extern uch BUFFER_ALIGNED outbuf[];
+
+/* Buffer for distances; see trees.c.  */
+extern ush d_buf[];
+
+/* Sliding window and suffix table (unlzw).  */
+extern uch BUFFER_ALIGNED window[];
 #define tab_suffix window
+
 #define tab_prefix prev      /* hash link (see deflate.c) */
 #define head (prev + WSIZE)  /* hash head (see deflate.c) */
-EXTERN (ush, tab_prefix);    /* prefix code (see unlzw.c) */
+/* prefix code (see unlzw.c) */
+extern ush tab_prefix[];
 
 extern unsigned insize; /* valid bytes in inbuf */
 extern unsigned inptr;  /* index of next byte to be processed in inbuf */

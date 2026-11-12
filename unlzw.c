@@ -69,7 +69,7 @@ union bytes
    }
 #endif
 
-/* DECLARE (ush, tab_prefix, 1 << BITS); -- prefix code */
+/* extern ush tab_prefix[1 << BITS]; prefix code */
 #define clear_tab_prefixof() memzero (tab_prefix, 256);
 #define de_stack        ((char_type *)(&d_buf[DIST_BUFSIZE-1]))
 

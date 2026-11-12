@@ -130,7 +130,7 @@ typedef unsigned IPos;
  * save space in the various tables. IPos is used only for parameter passing.
  */
 
-/* DECLARE(uch, window, 2L*WSIZE); */
+/* extern Pos BUFFER_ALIGNED window[2 * WSIZE]; */
 /* Sliding window. Input bytes are read into the second half of the window,
  * and move to the first half later to keep a dictionary of at least WSIZE
  * bytes. With this organization, matches are limited to a distance of
@@ -139,13 +139,13 @@ typedef unsigned IPos;
  * the window size to 64K, which is quite useful on MSDOS.
  */
 
-/* DECLARE(Pos, prev, WSIZE); */
+/* extern Pos prev[WSIZE]; */
 /* Link to older string with same hash index. To limit the size of this
  * array to 64K, this link is maintained only for the last 32K strings.
  * An index in this array is thus a window index modulo 32K.
  */
 
-/* DECLARE(Pos, head, 1<<HASH_BITS); */
+/* extern Pos head[1 << HASH_BITS]; */
 /* Heads of the hash chains or NIL. */
 
 static ulg const window_size = 2 * WSIZE;

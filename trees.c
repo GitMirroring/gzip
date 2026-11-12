@@ -251,9 +251,9 @@ static int base_dist[D_CODES];
 /* First normalized distance for each code (0 = distance of 1) */
 
 #define l_buf inbuf
-/* DECLARE(uch, l_buf, LIT_BUFSIZE);  buffer for literals or lengths */
+/* extern uch BUFFER_ALIGNED l_buf[LIT_BUFSIZE]; literals or lengths */
 
-/* DECLARE(ush, d_buf, DIST_BUFSIZE); buffer for distances */
+/* extern ush d_buf[DIST_BUFSIZE]; distances */
 
 static uch flag_buf[(LIT_BUFSIZE/8)];
 /* flag_buf is a bit array distinguishing literals from lengths in
