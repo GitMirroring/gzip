@@ -83,6 +83,14 @@ extern int method;         /* compression method */
 #    define DIST_BUFSIZE 0x8000 /* buffer for distances, see trees.c */
 #endif
 
+/* Maximum number of bits per LZW code.  Must be at least 16 to decompress
+   classic .Z files; unlzw.c would break if it exceeded 16.  */
+#define BITS 16
+
+/* Window size.  Must be a power of 2.  RFC 1951 specifies 2**15,
+   and deflate.c would break if it were any other value.  */
+#define WSIZE (1 << 15)
+
 /* With IBM_Z_DFLTCC, DEFLATE COMPRESSION works faster with
    page-aligned input and output buffers, and requires page-aligned
    windows; the alignment requirement is 4096.  On other platforms
@@ -97,22 +105,22 @@ extern int method;         /* compression method */
 /* Global buffers.  */
 
 /* Input buffer.  */
-extern uch BUFFER_ALIGNED inbuf[];
+extern uch BUFFER_ALIGNED inbuf[INBUFSIZ + INBUF_EXTRA];
 
 /* Output buffer.  */
-extern uch BUFFER_ALIGNED outbuf[];
+extern uch BUFFER_ALIGNED outbuf[OUTBUFSIZ + OUTBUF_EXTRA];
 
 /* Buffer for distances; see trees.c.  */
-extern ush d_buf[];
+extern ush d_buf[DIST_BUFSIZE];
 
 /* Sliding window and suffix table (unlzw).  */
-extern uch BUFFER_ALIGNED window[];
+extern uch BUFFER_ALIGNED window[2 * WSIZE];
 #define tab_suffix window
 
 #define tab_prefix prev      /* hash link (see deflate.c) */
 #define head (prev + WSIZE)  /* hash head (see deflate.c) */
 /* prefix code (see unlzw.c) */
-extern ush tab_prefix[];
+extern ush tab_prefix[1 << BITS];
 
 extern unsigned insize; /* valid bytes in inbuf */
 extern unsigned inptr;  /* index of next byte to be processed in inbuf */
@@ -155,10 +163,6 @@ typedef int file_t;     /* Do not use stdio */
 #define UNKNOWN 0xffff
 #define BINARY  0
 #define ASCII   1
-
-#ifndef WSIZE
-#  define WSIZE 0x8000     /* window size--must be a power of two, and */
-#endif                     /*  at least 32K for zip's deflate method */
 
 #define MIN_MATCH  3
 #define MAX_MATCH  258

@@ -16,9 +16,6 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifndef BITS
-#  define BITS 16
-#endif
 #define INIT_BITS 9              /* Initial number of bits per code */
 
 #define LZW_MAGIC "\037\235"     /* Magic header for lzw files, 1F 9D.  */
