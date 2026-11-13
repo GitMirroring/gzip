@@ -116,15 +116,7 @@ static int extra_blbits[BL_CODES]    /* extra bits for each bit length code */
 /* The three kinds of block type */
 
 #ifndef LIT_BUFSIZE
-#  ifdef SMALL_MEM
-#    define LIT_BUFSIZE  0x2000
-#  else
-#  ifdef MEDIUM_MEM
-#    define LIT_BUFSIZE  0x4000
-#  else
 #    define LIT_BUFSIZE  0x8000
-#  endif
-#  endif
 #endif
 #ifndef DIST_BUFSIZE
 #  define DIST_BUFSIZE  LIT_BUFSIZE

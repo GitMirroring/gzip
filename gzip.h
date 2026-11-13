@@ -70,29 +70,17 @@ extern int method;         /* compression method */
  */
 
 #ifndef INBUFSIZ
-#  ifdef SMALL_MEM
-#    define INBUFSIZ  0x2000  /* input buffer size */
-#  else
 #    define INBUFSIZ  0x40000 /* input buffer size */
-#  endif
 #endif
 #define INBUF_EXTRA  64     /* required by unlzw() */
 
 #ifndef OUTBUFSIZ
-#  ifdef SMALL_MEM
-#    define OUTBUFSIZ   8192  /* output buffer size */
-#  else
 #    define OUTBUFSIZ 0x40000 /* output buffer size */
-#  endif
 #endif
 #define OUTBUF_EXTRA 2048   /* required by unlzw() */
 
 #ifndef DIST_BUFSIZE
-#  ifdef SMALL_MEM
-#    define DIST_BUFSIZE 0x2000 /* buffer for distances, see trees.c */
-#  else
 #    define DIST_BUFSIZE 0x8000 /* buffer for distances, see trees.c */
-#  endif
 #endif
 
 #define EXTERN(type, array)  extern type array[]

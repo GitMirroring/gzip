@@ -84,20 +84,6 @@
  * Configuration parameters
  */
 
-/* Compile with MEDIUM_MEM to reduce the memory requirements or
- * with SMALL_MEM to use as little memory as possible. Use BIG_MEM if the
- * entire input file can be held in memory (not possible on 16 bit systems).
- * Warning: defining these symbols affects HASH_BITS (see below) and thus
- * affects the compression ratio. The compressed output
- * is still correct, and might even be smaller in some cases.
- */
-
-#ifdef SMALL_MEM
-#   define HASH_BITS  13  /* Number of bits used to hash strings */
-#endif
-#ifdef MEDIUM_MEM
-#   define HASH_BITS  14
-#endif
 #ifndef HASH_BITS
 #   define HASH_BITS  15
    /* For portability to 16 bit machines, do not use values above 15. */
@@ -151,8 +137,6 @@ typedef unsigned IPos;
  * WSIZE-MAX_MATCH bytes, but this ensures that IO is always
  * performed with a length multiple of the block size. Also, it limits
  * the window size to 64K, which is quite useful on MSDOS.
- * To do: limit the window size to WSIZE+BSZ if SMALL_MEM (the code would
- * be less efficient).
  */
 
 /* DECLARE(Pos, prev, WSIZE); */
@@ -164,9 +148,8 @@ typedef unsigned IPos;
 /* DECLARE(Pos, head, 1<<HASH_BITS); */
 /* Heads of the hash chains or NIL. */
 
-static ulg window_size = (ulg)2*WSIZE;
-/* window size, 2*WSIZE except for MMAP or BIG_MEM, where it is the
- * input file length plus MIN_LOOKAHEAD.
+static ulg const window_size = 2 * WSIZE;
+/* window size, always 2*WSIZE.
  */
 
 long block_start;
@@ -540,8 +523,6 @@ fill_window ()
         /* By the IN assertion, the window is not empty so we can't confuse
          * more == 0 with more == 64K on a 16 bit machine.
          */
-        Assert(window_size == (ulg)2*WSIZE, "no sliding with BIG_MEM");
-
         memcpy((char*)window, (char*)window+WSIZE, (unsigned)WSIZE);
         match_start -= WSIZE;
         strstart    -= WSIZE; /* we now have strstart >= MAX_DIST: */
