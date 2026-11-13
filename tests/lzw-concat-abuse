@@ -1,0 +1,128 @@
+#!/bin/sh
+# Test whether stale compression data can mess up later LZW compression.
+
+# Copyright 2026 Free Software Foundation, Inc.
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ..
+
+fail=0
+
+printf \
+'\037\235\fA\204\f\0312d\310\220!C\206\f\031'\
+'2d\310\220!C\206\f\0312d\310\220!C\206'\
+'\f\0312d\310\220!C\206\f\0312d\310\220!'\
+'C\206\f\0312d\310\220!C\206\f\0312d\310'\
+'\220!C\206\f\0312d\310\220!C\206\f\0312'\
+'d\310\220!C\206\f\0312d\310\220!C\206\f'\
+'\0312d\310\220!C\206\f\0312d\310\220!C'\
+'\206\f\0312d\310\220!C\206\f\0312d\310\220'\
+'!C\206\f\0312d\310\220!C\206\f\0312d'\
+'\310\220!C\206\f\0312d\310\220!C\206\f\031'\
+'2d\310\220!C\206\f\0312d\310\220!C\206'\
+'\f\0312d\310\220!C\206\f\0312d\310\220!'\
+'C\206\f\0312d\310\220!C\206\f\0312d\310'\
+'\220!C\206\f\0312d\310\220!C\206\f\0312'\
+'d\310\220!C\206\f\0312d\310\220!C\206\f'\
+'\0312d\310\220!C\206\f\0312d\310\220!C'\
+'\206\f\0312d\310\220!C\206\f\0312d\310\220'\
+'!C\206\f\0312d\310\220!C\206\f\0312d'\
+'\310\220!\0\001\0\0\0\0\0\0\0\314\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0'\
+  >c1.Z || framework_failure_
+
+printf \
+'\037\235\211a\302\204\t\023&L\2300a\302\204\t'\
+'\023&L\2300a\302\204\t\023&L\2300a\302'\
+'\204\t\023&L\2300a\302\204\t\023&L\2300'\
+'a\302\204\t\023&L\2300a\302\204\t\023&L'\
+'\2300a\302\204\t\023&L\2300a\302\204\t\023'\
+'&L\2300a\302\204\t\023&L\2300a\302\204'\
+'\t\023&L\2300a\302\204\t\023&L\2300a'\
+'\302\204\t\023&L\2300a\302\204\t\023&L\230'\
+'0a\302\204\t\023&L\2300a\302\204\t\023&'\
+'L\2300a\302\204\t\023&L\2300a\302\204\t'\
+'\023&L\2300a\302\204\t\023&L\2300a\302'\
+'\204\t\023&L\2300a\302\204\t\023&L\2300'\
+'a\302\204\t\023&L\2300a\302\204\t\023&L'\
+'\2300a\302\204\t\023&L\2300a\302\204\t\023'\
+'&L\2300a\302\204\t\023&L\2300a\302\204'\
+'\t\023&L\2300a\302\204\t\023&L\2300a'\
+'\302\204\t\023&L\2300a\302\204\t\023&L\230'\
+'0a\302\204\t\023&L\2300a\302\204\t\023&'\
+'L\2300\0\002\004\0\0\0\0\0\0\0\335\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0'\
+  >c2.Z || framework_failure_
+
+printf '\037\235\bA\0\002\004\0\0\0\0\0\0\0\0\0' >c3.Z || framework_failure_
+
+printf \
+'ABCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'CCCCCCCCCCCCCCCC'\
+'AB\314\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0aaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaaaaaaaaaaaaaa'\
+'aaaa\335\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'\
+'\0\0\0\0\0\0\0\0\0\0AAA\0\0A'\
+'\0\0\0\0\0\0\0\0'\
+  >exp || framework_failure_
+
+gzip -dc c1.Z c2.Z c3.Z >out 2>err || fail=1
+compare exp out || fail=1
+compare /dev/null err || fail=1
+
+Exit $fail

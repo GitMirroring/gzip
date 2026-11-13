@@ -24,6 +24,7 @@ TESTS =					\
   keep					\
   list					\
   lzh-lzh-ctable-abuse			\
+  lzw-concat-abuse			\
   lzw-lzh-abuse				\
   memcpy-abuse				\
   mixed					\

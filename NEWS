@@ -2,6 +2,12 @@ GNU gzip NEWS                                    -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bug fixes
+
+  A buffer overflow has been fixed when decompressing a .Z file
+  after decompressing some other file.
+  [bug present since the beginning]
+
 ** Platforms no longer supported
 
   Code has been removed that existed only for 16-bit MS-DOS platforms

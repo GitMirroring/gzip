@@ -70,11 +70,21 @@ union bytes
 #endif
 
 /* extern ush tab_prefix[1 << BITS]; prefix code */
-#define clear_tab_prefixof() memzero (tab_prefix, 256);
-#define de_stack        ((char_type *)(&d_buf[DIST_BUFSIZE-1]))
+#define de_base   ((char_type *) d_buf)
+#define de_stack  (de_base + sizeof d_buf)
 
 /* block compress mode -C compatible with 2.0 */
 static int block_mode = BLOCK_MODE;
+
+static void
+corrupt_input (int out, int outpos)
+{
+  if (0 < outpos)
+    write_buf (out, outbuf, outpos);
+  gzip_error (to_stdout
+              ? "corrupt input."
+              : "corrupt input. Use zcat to recover some data.");
+}
 
 /* ============================================================================
  * Decompress in to out.  This routine adapts to the codes in the
@@ -113,7 +123,6 @@ unlzw (int in, int out)
               (unsigned int) maxbits & LZW_RESERVED));
     }
     maxbits &= BIT_MASK;
-    maxmaxcode = MAXCODE(maxbits);
 
     if (maxbits > BITS) {
         fprintf(stderr,
@@ -122,6 +131,7 @@ unlzw (int in, int out)
         exit_code = ERROR;
         return ERROR;
     }
+    maxmaxcode = MAXCODE (maxbits);
     rsize = insize;
     maxcode = MAXCODE(n_bits = INIT_BITS)-1;
     bitmask = (1<<n_bits)-1;
@@ -132,11 +142,12 @@ unlzw (int in, int out)
 
     free_ent = ((block_mode) ? FIRST : 256);
 
-    clear_tab_prefixof(); /* Initialize the first 256 entries in the table. */
-
+    memzero (tab_prefix, sizeof tab_prefix);
     for (code = 255 ; code >= 0 ; --code) {
         tab_suffix[code] = (char_type)code;
     }
+    memzero (tab_suffix + 256, ((1 << BITS) - 256) * sizeof *tab_suffix);
+
     do {
         int i;
         int  e;
@@ -181,17 +192,18 @@ unlzw (int in, int out)
 
             if (oldcode == -1) {
                 if (256 <= code)
-                  gzip_error ("corrupt input.");
+                  corrupt_input (out, outpos);
                 outbuf[outpos++] = (char_type)(finchar = (int)(oldcode=code));
                 continue;
             }
             if (code == CLEAR && block_mode) {
-                clear_tab_prefixof();
+                memzero (tab_prefix, sizeof tab_prefix);
                 free_ent = FIRST - 1;
                 posbits = ((posbits-1) +
                            ((n_bits<<3)-(posbits-1+(n_bits<<3))%(n_bits<<3)));
                 maxcode = MAXCODE(n_bits = INIT_BITS)-1;
                 bitmask = (1<<n_bits)-1;
+                oldcode = -1;
                 goto resetbuf;
             }
             incode = code;
@@ -211,11 +223,7 @@ unlzw (int in, int out)
                             "posbits:%ld inbuf:%02X %02X %02X %02X %02X\n",
                             posbits, p[-1],p[0],p[1],p[2],p[3]);
 #endif
-                    if (outpos > 0)
-                      write_buf (out, outbuf, outpos);
-                    gzip_error (to_stdout
-                                ? "corrupt input."
-                                : "corrupt input. Use zcat to recover some data.");
+                    corrupt_input (out, outpos);
                 }
                 *--stackp = (char_type)finchar;
                 code = oldcode;
@@ -224,6 +232,8 @@ unlzw (int in, int out)
             while ((cmp_code_int)code >= (cmp_code_int)256) {
                 /* Generate output characters in reverse order */
                 *--stackp = tab_suffix[code];
+                if (stackp == de_base)
+                  corrupt_input (out, outpos);
                 code = tab_prefix[code];
             }
             finchar = tab_suffix[code];
