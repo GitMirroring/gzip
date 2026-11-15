@@ -50,14 +50,12 @@
 /gnulib-common.m4
 /gnulib-comp.m4
 /gnulib-tool.m4
-/gnu-make.m4
 /include_next.m4
 /init-package-version.m4
 /inttypes.m4
 /largefile.m4
 /lib-ignore.m4
 /limits-h.m4
-/locale-en.m4
 /lseek.m4
 /lstat.m4
 /malloca.m4
@@ -126,7 +124,6 @@
 /vararrays.m4
 /warnings.m4
 /warn-on-use.m4
-/wint_t.m4
 /xalloc.m4
 /yesno.m4
 /zzgnulib.m4
