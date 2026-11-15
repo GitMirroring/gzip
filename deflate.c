@@ -86,7 +86,7 @@
 
 #ifndef HASH_BITS
 #   define HASH_BITS  15
-   /* For portability to 16 bit machines, do not use values above 15. */
+   /* For portability to 32 bit machines, do not use values above 31. */
 #endif
 
 /* To save space (see unlzw.c), we overlay prev+head with tab_prefix and
@@ -148,9 +148,7 @@ typedef unsigned IPos;
 /* extern Pos head[1 << HASH_BITS]; */
 /* Heads of the hash chains or NIL. */
 
-static ulg const window_size = 2 * WSIZE;
-/* window size, always 2*WSIZE.
- */
+enum { window_size = 2 * WSIZE };
 
 long block_start;
 /* window position at the beginning of the current output block. Gets
@@ -417,7 +415,7 @@ longest_match(IPos cur_match)
         /* The funny "do {}" generates better code on most compilers */
 
         /* Here, scan <= window+strstart+257 */
-        Assert(scan <= window+(unsigned)(window_size-1), "wild scan");
+        Assert (scan < window + window_size, "wild scan");
         if (*scan == *match) scan++;
 
         len = (MAX_MATCH - 1) - (int)(strend-scan);
@@ -513,16 +511,8 @@ fill_window ()
     /* If the window is almost full and there is insufficient lookahead,
      * move the upper half to the lower one to make room in the upper half.
      */
-    if ((unsigned) EOF <= more) {
-        /* Very unlikely, but possible on 16 bit machine if strstart == 0
-         * and lookahead == 1 (input done one byte at time)
-         */
-        static_assert (2 < (unsigned) EOF);
-        more = (unsigned) EOF - 1;
-    } else if (strstart >= WSIZE+MAX_DIST) {
-        /* By the IN assertion, the window is not empty so we can't confuse
-         * more == 0 with more == 64K on a 16 bit machine.
-         */
+    static_assert (window_size < (unsigned int) EOF);
+    if (WSIZE + MAX_DIST <= strstart) {
         memcpy((char*)window, (char*)window+WSIZE, (unsigned)WSIZE);
         match_start -= WSIZE;
         strstart    -= WSIZE; /* we now have strstart >= MAX_DIST: */

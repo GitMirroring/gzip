@@ -58,8 +58,8 @@ typedef unsigned long  ulg;
 #define MAX_METHODS 9
 extern int method;         /* compression method */
 
-/* To save memory for 16 bit systems, some arrays are overlaid between
- * the various modules:
+/* To save memory (originally for 16 bit systems, though they are no longer
+ * supported), some arrays are overlaid between the various modules:
  * deflate:  prev+head   window      d_buf  l_buf  outbuf
  * unlzw:    tab_prefix  tab_suffix  stack  inbuf  outbuf
  * inflate:              window             inbuf
@@ -174,7 +174,7 @@ typedef int file_t;     /* Do not use stdio */
  */
 
 #define MAX_DIST  (WSIZE-MIN_LOOKAHEAD)
-/* In order to simplify the code, particularly on 16 bit machines, match
+/* To simplify the code, match
  * distances are limited to MAX_DIST instead of WSIZE.
  */
 

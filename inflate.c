@@ -122,8 +122,7 @@
 #include "gzip.h"
 #define slide window
 
-/* Huffman code lookup table entry--this entry is four bytes for machines
-   that have 16-bit pointers (e.g. PC's in the small or medium model).
+/* Huffman code lookup table entry.
    Valid extra bits are 0..13.  e == 15 is EOB (end of block), e == 16
    means that v is a literal, 16 < e < 32 means that v is a pointer to
    the next table, which codes e - 16 bits, and lastly e == 99 indicates

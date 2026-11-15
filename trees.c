@@ -1014,8 +1014,7 @@ ct_tally (int dist, int lc)
         if (last_dist < last_lit/2 && out_length < in_length/2) return 1;
     }
     return (last_lit == LIT_BUFSIZE-1 || last_dist == DIST_BUFSIZE);
-    /* We avoid equality with LIT_BUFSIZE because of wraparound at 64K
-     * on 16 bit machines and because stored blocks are restricted to
+    /* Avoid equality with LIT_BUFSIZE because stored blocks are restricted to
      * 64K-1 bytes.
      */
 }
@@ -1073,7 +1072,7 @@ compress_block (ct_data *ltree, ct_data *dtree)
  * Set the file type to ASCII or BINARY, using a crude approximation:
  * binary if more than 20% of the bytes are <= 6 or >= 128, ascii otherwise.
  * IN assertion: the fields freq of dyn_ltree are set and the total of all
- * frequencies does not exceed 64K (to fit in an int on 16 bit machines).
+ * frequencies does not exceed UINT_MAX.
  */
 static void
 set_file_type ()

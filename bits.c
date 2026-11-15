@@ -38,8 +38,7 @@
  *
  *      For in-memory compression, the compressed bit stream goes directly
  *      into the requested output buffer. The input data is read in blocks
- *      by the mem_read() function. The buffer is limited to 64K on 16 bit
- *      machines.
+ *      by the mem_read() function.
  *
  *  INTERFACE
  *
