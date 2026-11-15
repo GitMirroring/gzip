@@ -148,9 +148,9 @@ static int huft_free (struct huft *);
    circular buffer.  The index is updated simply by incrementing and then
    and'ing with 0x7fff (32K-1). */
 /* It is left to other modules to supply the 32K area.  It is assumed
-   to be usable as if it were declared "uch slide[32768];" or as just
-   "uch *slide;" and then malloc'ed in the latter case.  The definition
-   must be in unzip.h, included above. */
+   to be usable as if it were declared "uch slide[N];" where N is
+   at least 32768.  */
+static_assert (sizeof *slide == sizeof (uch) && 32768 <= sizeof slide);
 /* unsigned wp;             current position in slide */
 static bool fresh;
 #define wp outcnt
