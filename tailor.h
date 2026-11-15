@@ -78,7 +78,6 @@
 #  define SET_BINARY_MODE(fd) setmode(fd, O_BINARY)
 #  define UNLINK_READONLY_BUG
 #  include <io.h>
-#  include <malloc.h>
 #  ifdef NTFAT
 #    define NO_MULTIPLE_DOTS
 #    define MAX_EXT_CHARS 3
