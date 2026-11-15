@@ -14,6 +14,11 @@ GNU gzip NEWS                                    -*- outline -*-
   like Turbo C.
   [16-bit MS-DOS has not worked since gzip-1.3]
 
+** Speedups
+
+  gzip -d now copies memory faster from its internal window, improving
+  performance by 15% in some simple benchmarks.
+
 
 * Noteworthy changes in release 1.15 (2026-09-20) [stable]
 

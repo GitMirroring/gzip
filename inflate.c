@@ -590,18 +590,44 @@ inflate_codes(struct huft *tl, struct huft *td, int bl, int bd)
       do {
         n -= (e = (e = WSIZE - ((d &= WSIZE-1) > w ? d : w)) > n ? n : e);
 #ifndef DEBUG
-        if (e <= (d < w ? w - d : d - w))
         {
-          memcpy(slide + w, slide + d, e);
+          /* Speedup for typical platforms, which can move 16 bytes with
+             a single load/store.  It is OK to move more bytes than
+             necessary so long as they are present in the source and fit
+             in the destination buffer, as excess bytes copied to the
+             destination are ignored.  */
+          enum { MOVE_BYTES = 16 };
+
+          if (e <= MOVE_BYTES
+              && (w <= d
+                  ? w + MOVE_BYTES <= d && d <= WSIZE - MOVE_BYTES
+                  : d + MOVE_BYTES <= w && w <= WSIZE - MOVE_BYTES))
+            memcpy (slide + w, slide + d, MOVE_BYTES);
+          else if (w <= d || e <= w - d)
+            memmove (slide + w, slide + d, e);
+          else
+            {
+              /* A repeating sequence, where memmove does not suffice.  */
+              unsigned int ee = e, ww = w;
+              do
+                {
+                  unsigned int chunk = ee < ww - d ? ee : ww - d;
+                  memcpy (slide + ww, slide + d, chunk);
+                  ww += chunk;
+                  ee -= chunk;
+                }
+              while (ee);
+            }
+
           w += e;
           d += e;
         }
-        else                      /* do it slow to avoid memcpy() overlap */
-#endif
+#else
           do {
             slide[w++] = slide[d++];
             Tracevv((stderr, "%c", slide[w-1]));
           } while (--e);
+#endif
         if (w == WSIZE)
         {
           flush_output(w);
