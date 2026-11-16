@@ -602,6 +602,8 @@ inflate_codes(struct huft *tl, struct huft *td, int bl, int bd)
                   ? w + MOVE_BYTES <= d && d <= WSIZE - MOVE_BYTES
                   : d + MOVE_BYTES <= w && w <= WSIZE - MOVE_BYTES))
             memcpy (slide + w, slide + d, MOVE_BYTES);
+          else if (w - d == 1)
+            memset (slide + w, slide[d], e);
           else if (w <= d || e <= w - d)
             memmove (slide + w, slide + d, e);
           else
